@@ -1,0 +1,18 @@
+---
+# Show all available Openstack images
+- name: Retrive all available Openstack images
+  os_image_facts:
+  
+
+- name: Get image names and IDs
+  set_fact:
+    image_facts: "{{  images_facts|default([]) + [ {'name': item.name, 'id': item.id} ] }}"
+  loop: '{{ openstack_image }}'
+  when: item.name is defined
+
+- name: Show images
+  debug: 
+    msg: "Image name: {{ item.name }}; Image id: {{ item.id }}"
+  loop: '{{ image_facts }}'
+
+  

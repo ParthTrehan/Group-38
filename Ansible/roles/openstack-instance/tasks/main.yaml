@@ -1,0 +1,47 @@
+# create an instance on NECTAR
+- name: Create an instance
+  os_server:
+    name: '{{ item.0.instance_name }}'
+    image: '{{ item.0.instance_image }}'
+    key_name: '{{ item.0.instance_key_name }}'
+    flavor: '{{ item.0.instance_flavor }}'
+    availability_zone: '{{ availability_zone }}'
+    security_groups: ['ssh','http','couchdb3','node']
+    volumes: '{{ item.1 }}'
+    auto_floating_ip: yes
+    wait: yes
+    timeout: 600
+    state: present
+  with_together:
+    - '{{ instances }}'
+    - '{{ os_vol_ids }}'
+  register: os_instance
+
+- name: Create a list of host IPs
+  set_fact: 
+     host_IPs: '{{ host_IPs|default([]) + [ item.openstack.public_v4 ] }}'
+  loop: '{{ os_instance.results }}'
+
+- debug: 
+    msg: "Instance has been created. IP address is {{ host_IPs }}"
+
+- name: add harvesters
+  lineinfile:
+    dest: hosts
+    regexp: 'harvesters' 
+    line: '[harvesters]\n{{host_IPs[0]}}\n{{host_IPs[1]}}\n{{host_IPs[2]}}'
+    backrefs: yes
+
+- name: add webserver
+  lineinfile:
+    dest: hosts
+    regexp: 'webserver' 
+    line: '[webserver]\n{{host_IPs[3]}}'
+    backrefs: yes
+
+- name: add all
+  lineinfile:
+    dest: hosts
+    regexp: 'all' 
+    line: '[all]\n{{host_IPs[0]}}\n{{host_IPs[1]}}\n{{host_IPs[2]}}\n{{host_IPs[3]}}'
+    backrefs: yes

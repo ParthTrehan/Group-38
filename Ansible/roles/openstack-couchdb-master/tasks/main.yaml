@@ -1,0 +1,36 @@
+---
+
+# - name: Copy the cluster config script
+#   copy:
+#     src: add_cluster_node.sh
+#     dest: /home/ubuntu/add_cluster_node.sh
+
+# - name: debug
+#   debug: var = s{{ masternode }}
+
+# - name: Execute the cluster config script
+#   shell: sh /home/ubuntu/add_cluster_node.sh {{ masternode }} {{ item }}
+#   loop: "{{groups['harvesters']}}"
+
+# - name: add admin and pass
+#   shell: '{{item}}'
+#   with_items:
+#     - export user=admin
+#     - export pass=admin
+
+# - name: finish cluster
+#   shell: 'curl -XPOST "http://${user}:${pass}@${masternode}:5984/_cluster_setup" \ --header "Content-Type: application/json" --data "{\"action\": \"finish_cluster\"}"'
+
+# - name: create database
+#   shell: 'curl -XPUT "http://${user}:${pass}@${masternode}:5984/twitter"'
+
+# - name: enable the cluster
+#   uri: status_code=201 HEADER_Content-Type="application/json" user=admin password=admin method=POST body_format=json url=http://admin:admin@{{ ansible_eth0.ipv4.address }}:5984/_cluster_setup body='{"action":"enable_cluster","bind_address":"0.0.0.0","username":"admin","password":"admin","node_count":3}'
+#   ignore_errors: yes
+  
+- name: add nodes to the cluster
+  uri: status_code=201,409 HEADER_Content-Type="application/json" user=admin password=admin method=POST force_basic_auth=yes body_format=json url=http://admin:admin@{{ ansible_eth0.ipv4.address }}:5984/_cluster_setup body='{"action":"add_node","username":"admin","password":"admin","host":"{{ item }}","port":5984}'
+  with_items: "{{groups['harvesters']}}"
+
+- name: finish the cluster
+  uri: status_code=201 HEADER_Content-Type="application/json" user=admin password=admin method=POST force_basic_auth=yes url=http://admin:admin@{{ ansible_eth0.ipv4.address }}:5984/_cluster_setup body_format=json body='{"action":"finish_cluster"}'
