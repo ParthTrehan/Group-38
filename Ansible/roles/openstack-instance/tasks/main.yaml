@@ -6,7 +6,7 @@
     key_name: '{{ item.0.instance_key_name }}'
     flavor: '{{ item.0.instance_flavor }}'
     availability_zone: '{{ availability_zone }}'
-    security_groups: ['ssh','http','couchdb3','node']
+    security_groups: ['ssh','http','couchdb3','node','internal']
     volumes: '{{ item.1 }}'
     auto_floating_ip: yes
     wait: yes

@@ -103,3 +103,22 @@
   with_items:
     - export user=admin
     - export pass=admin
+
+- name: Setup Build Environment
+  apt:
+    name: 
+      - build-essential 
+      - pkg-config 
+      - erlang 
+      - libicu-dev 
+      - libmozjs185-dev 
+      - libcurl4-openssl-dev
+    state: latest
+    install_recommends: no
+
+- name: stop UFW
+  shell: 'systemctl stop ufw'
+
+  
+- name: disable UFW
+  shell: 'systemctl disable ufw'
