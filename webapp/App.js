@@ -2,6 +2,8 @@ const express = require('express');
 const bodyparser = require('body-parser');
 const path = require('path');
 const NodeCouchDb = require('node-couchdb');
+const fs = require('fs');
+
 
 // node-couchdb instance talking to external service
 const couchExternal = new NodeCouchDb({
@@ -22,18 +24,25 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(bodyparser.json());
-app.use(bodyparser.urlencoded({ extended: false }));
+app.use(bodyparser.urlencoded({
+    extended: false
+}));
 
 app.get('/', function (req, res) {
     couchExternal.get(dbName, viewurl).then(
         function (data, headers, status) {
             res.render('index', {
-                grid:data.data.rows[0]
+                grid: data.data.rows[0]
             });
         },
         function name(err) {
             res.send(err);
         });
+});
+
+app.get('/data', function (req, res) {
+    let rawdata = fs.readFileSync('test.json');
+    res.send(rawdata); //replace with your data here
 });
 
 app.listen(3000, function () {
