@@ -8,8 +8,8 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js">
-  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
   <style>
     /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
@@ -69,9 +69,6 @@
       <canvas id="barChart" width="400" height="400"></canvas>
     </div>
   </div>
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous">
-  </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
     integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous">
   </script>
@@ -395,13 +392,14 @@
     //-----------------------------------------------------------------------------------------------------------------
     var map;
     var allPoly = [];
-    barChartConfig = {
+    var days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    var barChartConfig = {
       type: 'bar',
       data: {
         labels: ['Stalking/Harasment', 'Sexual offences', 'Lust metric'],
         datasets: [{
           label: 'LGA crime and tweet distribution',
-          data: [40, 30, 12],
+          data: [0, 0, 0],
           backgroundColor: [
             'rgba(255, 99, 132, 0.2)',
             'rgba(54, 162, 235, 0.2)',
@@ -435,7 +433,7 @@
           label: 'Lust Tweet',
           backgroundColor: 'rgba(255, 99, 132, 1)',
           borderColor: 'rgba(255, 99, 132, 1)',
-          data: [239, 500, 991, 458, 320, 678, 227],
+          data: [0, 0, 0, 0, 0, 0, 0],
           fill: true,
         }]
       },
@@ -469,12 +467,13 @@
     }
 
     function addPolyOnMap(contentStrings) {
+      console.log(contentStrings)
       console.log(map)
       for (let index = 0; index < allPoly.length; index++) {
         allPoly[index].setMap(map);
         infoWindow = new google.maps.InfoWindow();
         google.maps.event.addListener(allPoly[index], "mousemove", function (event) {
-          infoWindow.setContent(contentStrings[index]);
+          infoWindow.setContent(contentStrings[index][1]);
           infoWindow.setPosition(event.latLng);
           infoWindow.open(map, allPoly[index]);
         });
@@ -482,21 +481,38 @@
           infoWindow.close(map, allPoly[index]);
         });
         google.maps.event.addListener(allPoly[index], 'click', function () {
-          lineChartConfig.data.datasets.forEach(function (dataset) {
-            dataset.data = dataset.data.map(function () {
-              return getRandomInt(50)
-            });
+          $.ajax({
+            url: "/data",
+            type: 'GET',
+            success: function (res) {
+              console.log(res);
+              lineChartConfig.data.datasets[0].data = getWeekData(JSON.parse(res), contentStrings[index][0]);
+              barChartConfig.data.datasets[0].data = [50, 60, 70]
+              window.lineChart.update();
+              window.barChart.update();
+            }
           });
-          barChartConfig.data.datasets.forEach(function (dataset) {
-            dataset.data = dataset.data.map(function () {
-              return getRandomInt(50)
-            });
-
-          });
-          window.lineChart.update();
-          window.barChart.update();
         });
       }
+    }
+
+    function getWeekData(data, lga) {
+      var result = [];
+      for (let index = 0; index < days.length; index++) {
+        flag=false
+        data.rows.forEach(element => {
+          arr = [lga, days[index], 1]
+          if ( $(element.key).not(arr).length === 0 && $(arr).not(element.key).length === 0) {
+            flag=true
+            result.push(element.value)
+          }
+          
+        });
+        if (!flag) {
+          result.push(0)
+        }
+      }
+      return result;
     }
 
     function perc2color(perc) {
@@ -537,11 +553,13 @@
         //-------------------------------
         var lustIndex = getRandomInt(100);
         // -------------------------------
-
-        contents.push("<h6>" + grid_coordinates[index].properties.vic_lga__2 + "</h6><br />" +
+        var lga = [];
+        lga.push(grid_coordinates[index].properties.vic_lga__2);
+        lga.push("<h6>" + grid_coordinates[index].properties.vic_lga__2 + "</h6><br />" +
           "<p>LGA Code: " + grid_coordinates[index].properties.lga_pid + "<br />" +
           "LGA Population: " + Aurin_data.features[index].properties.lga_erp + "<br />" +
           "Total Lust tweet Index: " + lustIndex + "<br /></p>");
+        contents.push(lga);
         // Construct all the polygons.
         allPoly.push(new google.maps.Polygon({
           paths: makePolygonPaths(grid_coordinates[index].geometry.coordinates[0][0]),
@@ -552,7 +570,7 @@
           fillOpacity: 0.35
         }));
       }
-      addPolyOnMap(contents, map);
+      addPolyOnMap(contents);
     }
 
     function makeSexualOffencesValidationMap() {
@@ -563,13 +581,16 @@
         var temp = Aurin_data.features[index].properties;
         var crimeRate = getCrimeRate(temp.a30_sexual_offences, temp.lga_erp)
         crimeRate = (crimeRate / 496) * 100
-        contents.push("<h6>LGA name: " + grid_coordinates[index].properties.vic_lga__2 + "</h6><br />" +
+        var lga = [];
+        lga.push(grid_coordinates[index].properties.vic_lga__2);
+        lga.push("<h6>LGA name: " + grid_coordinates[index].properties.vic_lga__2 + "</h6><br />" +
           "<p> Test LGA name: " + temp.lga_name11 + "<br />" +
           "LGA Code: " + grid_coordinates[index].properties.lga_pid + "<br />" +
           "Sexual Offences: " + temp.a30_sexual_offences + "<br />" +
           "%%%%%%: " + crimeRate + "<br />" +
           "LGA Population: " + temp.lga_erp + "<br />" +
           "Crime Rate per 100,000: " + crimeRate + "<br /></p>");
+        contents.push(lga);
         // Construct all the polygons.
         allPoly.push(new google.maps.Polygon({
           paths: makePolygonPaths(grid_coordinates[index].geometry.coordinates[0][0]),
@@ -580,7 +601,7 @@
           fillOpacity: 0.35
         }));
       }
-      addPolyOnMap(contents, map);
+      addPolyOnMap(contents);
     }
 
     function makeStalkingHarassmentValidationMap() {
@@ -592,13 +613,15 @@
 
         var crimeRate = getCrimeRate(temp.a70_stalking_harassment__and__threatening_behaviour, temp.lga_erp)
         crimeRate = (crimeRate / 360) * 100
-        contents.push("<h6>LGA name: " + grid_coordinates[index].properties.vic_lga__2 + "</h6><br />" +
+        lga.push(grid_coordinates[index].properties.vic_lga__2);
+        lga.push("<h6>LGA name: " + grid_coordinates[index].properties.vic_lga__2 + "</h6><br />" +
           "<p> Test LGA name: " + Aurin_data.features[index].properties.lga_name11 + "<br />" +
           "LGA Code: " + grid_coordinates[index].properties.lga_pid + "<br />" +
           "Stalking & Harassment Offences: " + temp.a70_stalking_harassment__and__threatening_behaviour + "<br />" +
           "%%%%%%: " + crimeRate + "<br />" +
           "LGA Population: " + temp.lga_erp + "<br />" +
           "Crime Rate per 100,000: " + crimeRate + "<br /></p>");
+        contents.push(lga);
         // Construct all the polygons.
         allPoly.push(new google.maps.Polygon({
           paths: makePolygonPaths(grid_coordinates[index].geometry.coordinates[0][0]),
@@ -609,7 +632,7 @@
           fillOpacity: 0.35
         }));
       }
-      addPolyOnMap(contents, map);
+      addPolyOnMap(contents);
     }
 
     function resetMap() {
