@@ -62,5 +62,13 @@
 		"access_token_key" : "1127483290586247169-CHGqrJNYGEuauJdqtx5vMghBQ96W4L",
 		"access_token_secret" : "sEBFlA3gb5QiNkpsPbeBnGQLres8wRTqYbLqdHroJB8y3",
 		"locations" : [144.95,-38.03,145.54,-37.30]
+	},
+	"id9" :
+	{
+		"consumer_key" : "6HICs0RtYml2opGrk6noq6R1c",
+		"consumer_secret" : "fC1haOeXzk5DcxbQ85sJWPBLTTEWnTawvaCopBOtEcYu5PSYw4",
+		"access_token_key" : "154065515-BnIXkkvY5aovntYu1ncWzPQTm3uouP9l7G2b21Gv",
+		"access_token_secret" : "IHvUcsnvDNUltFv1l0B8SafCslZshqpzrsbAQZV4tjG63",
+		"locations" : [144.63,-38.51,145.54,-38.03]
 	}
 }

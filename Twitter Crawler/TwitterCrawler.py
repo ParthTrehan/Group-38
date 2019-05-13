@@ -48,7 +48,7 @@ def add_tweet(tweet_data):
     tweet_dow = tweet_data["created_at"].split()[0]
 
     if tweet_lang == "en" and tweet_coords is not None:
-        #print(tweet_coords)
+        print(tweet_coords)
         if tweet_coords["coordinates"][0] >= 144.43 and tweet_coords["coordinates"][0] <= 145.41 and tweet_coords["coordinates"][1] >= -38.53 and tweet_coords["coordinates"][1] <= -37.40:
             #Classifying tweets based on keywords
             if profanity.contains_profanity(tweet_text) or any(i.lower() in tweet_text.lower() for i in lust_words):
@@ -147,6 +147,7 @@ while True:
         stream = Stream(auth, listener())
         print("Harvester started using id : ", id)
         stream.filter(locations = locations)
+        #stream.filter(track=["football"])
     except Exception as e:
         count += 1
         print(e)
