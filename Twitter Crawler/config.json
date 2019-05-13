@@ -1,0 +1,66 @@
+{
+	"id1" :
+	{
+		"consumer_key" : "JE3qCjDM3qEpuvydWP5VoUZKG",
+		"consumer_secret" : "iILj9zBRt5m2Eeva7D4g3QFNoHNdjruTt5UqT7gAUBHyzrta2m",
+		"access_token_key" : "1125231272484163585-267EnjT6bEsksrWnLiAUBbYXdXEQvX",
+		"access_token_secret" : "KMnsXfVeigCvYEBIBKAEeb0PLnfzP6FvpofZgnp4zUFBA",
+		"locations" : [144.40,-38.03,144.95,-37.30]
+	},
+	"id2" :
+	{
+		"consumer_key" : "muuWQDEQYlKJrqeYXBclZjL5Z",
+		"consumer_secret" : "2UrF6OKzboZ6WKaN5Z0rlyRQdpgM7sHgQCsmKKaA0gG9xLWScm",
+		"access_token_key" : "1125270303972552704-ucQfkMXSuqG4KmH5pC2GXDh1XA2PVk",
+		"access_token_secret" : "FBF1SdLqC4ZNdLVvWHTmTexoBYXxFgkudV8vkhFeY1h1T",
+		"locations" : [144.95,-38.03,145.54,-37.30]
+	},
+	"id3" :
+	{
+		"consumer_key" : "t5guGghPko2nF42RAwJ9U1Cdo",
+		"consumer_secret" : "LtWdrBG51NwkaazgCr7oC08YYRxUKZVmODHQDrDmyNzc6ALO6h",
+		"access_token_key" : "1124920037691645952-N3EIvv5Ro9ChBMdpBGmCwhvaoKIHyO",
+		"access_token_secret" : "QNz8EvFm9vWz6jZw3uZxxj9ejmIZDMeJtr6a9uR8TOVx3",
+		"locations" : [144.63,-38.51,145.54,-38.03]
+	},
+	"id4" :
+	{
+		"consumer_key" : "co2jJuHeBTWuuf2U8pVOAfSMi",
+		"consumer_secret" : "qaoAbStccbYWRQ4fPrd5LSev0tCzsLSIO4DIJP5dUH5hoSs4pM",
+		"access_token_key" : "1125241485647958016-XGC0R9wFgyWYRSQl0Z9mQa1CqjUK0g",
+		"access_token_secret" : "PCwHCu3zwDRuqRO4CWw1hNbSB4lCoXYyGxfzUoEtMg75z",
+		"locations" : [144.40,-38.03,144.95,-37.30]
+	},
+	"id5" :
+	{
+		"consumer_key" : "RVRqTQf8wmiwiNQxk3bVJrCpf",
+		"consumer_secret" : "1nFMpGkTJqsMffzvcsbLv3UZT8esxQKRLeGDfd2E5awkTcCZT3",
+		"access_token_key" : "1127238853478060033-qzUTT3OEQVGGBYMpUkpBXVvyK40ukf",
+		"access_token_secret" : "rKEdOpNpqrjUjh6gkNaRvjeUrrpPERVZ1Rrn8qrdyCJf4",
+		"locations" : [144.95,-38.03,145.54,-37.30]
+	},
+	"id6" :
+	{
+		"consumer_key" : "05oXp48aDVM0lTnTaf8hzcUfF",
+		"consumer_secret" : "EbiWkfzhXEPvwHILc6df5rpcyIQfslJkTZ1U6ymLRIUDIhLszi",
+		"access_token_key" : "1127454591379918850-NlaLM2pQnRnSJLovhMYJn4fFXiYz1g",
+		"access_token_secret" : "T4FXX0rvPWDhnpO9BqSvVO0qwiG4ayGV9v0nvNNsG36AC",
+		"locations" : [144.63,-38.51,145.54,-38.03]
+	},
+	"id7" :
+	{
+		"consumer_key" : "xxgUGNfaJL5uePBCGhgt8u915",
+		"consumer_secret" : "Iu8De8z9OZQJWARhOc3OdZbDFdjdQjOZGaICaRlaZIB3MGjyOK",
+		"access_token_key" : "1127478964971163649-Ymf3GSsPWIFubELkLgNrz1QOwWtoTZ",
+		"access_token_secret" : "h1loLf9GTenFTVAJkpOmRI5lHCDCmahOVWW0MxmM5Pi6E",
+		"locations" : [144.40,-38.03,144.95,-37.30]
+	},
+	"id8" :
+	{
+		"consumer_key" : "NvfCroM32wuJWyZlkjFsnUHx2",
+		"consumer_secret" : "bBhSXNslhHinyKtYV9SYx21Betz7GzdBJfdrRuaEancyyFqQz9",
+		"access_token_key" : "1127483290586247169-CHGqrJNYGEuauJdqtx5vMghBQ96W4L",
+		"access_token_secret" : "sEBFlA3gb5QiNkpsPbeBnGQLres8wRTqYbLqdHroJB8y3",
+		"locations" : [144.95,-38.03,145.54,-37.30]
+	}
+}

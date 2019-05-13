@@ -1,0 +1,5 @@
+{
+    "db_url" : "http://localhost:5984/",
+    "tweets_db_name" : "tweets",
+    "users_db_name" : "users"
+}
