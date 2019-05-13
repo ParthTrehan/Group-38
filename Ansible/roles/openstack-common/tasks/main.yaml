@@ -29,6 +29,13 @@
     state: latest
     update-cache: yes
 
+- name: Install git
+  become: yes
+  apt:
+    name: ['git']
+    state: latest
+    update-cache: yes
+
 # Install miniconda
 - name: Install Conda
   block:

@@ -27,10 +27,12 @@
   remote_user: ubuntu
   become: yes
   roles:
+    - role: openstack-mount-volume
     - role: openstack-common
 
 - hosts: webserver
   remote_user: ubuntu
-  become: yes
+  sudo: yes
   roles:
     - role: openstack-couchdb-master
+    - role: openstack-webapp

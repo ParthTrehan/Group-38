@@ -11,6 +11,3 @@
 
 - name: finish clusters
   shell: 'curl -XPOST "http://admin:admin@{{ ansible_eth0.ipv4.address }}:5984/_cluster_setup" \ --header "Content-Type: application/json" --data "{\"action\": \"finish_cluster\"}"'
-
-- name: create database
-  shell: 'curl -XPUT "http://admin:admin@{{ ansible_eth0.ipv4.address }}:5984/twitter"'

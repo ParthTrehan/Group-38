@@ -1,0 +1,63 @@
+
+- name: add nodesource nodejs
+  shell: "curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -"
+
+- name: install 
+  shell: sudo apt-get install -y nodejs
+
+- name: Install Packages
+  apt: name={{ item }} update_cache=yes state=latest
+  with_items:
+    - git
+
+- name: Install pm2
+  npm: name=pm2 global=yes production=yes
+
+- name: Create APP Directory
+  file: path=/home/ubuntu/webapp state=directory
+
+- name: Git Clone webapp
+  git: repo=https://github.com/kush0609/webapp.git dest=/home/ubuntu/webapp update=yes force=yes
+  register: git_finished
+
+- name: Running NPM install
+  npm: path=/home/ubuntu/webapp
+  register: npm_finished
+  when: git_finished.changed
+
+
+- name: Create Grid database
+  shell: 'curl -XPUT "http://admin:admin@{{ ansible_eth0.ipv4.address }}:5984/grid"'
+
+- name: get remote grid
+  command: "cat /home/ubuntu/webapp/grid.json"
+  register: grid
+
+- name: Add Grid doc
+  uri:
+    url: http://admin:admin@{{ ansible_eth0.ipv4.address }}:5984/grid/map
+    method: PUT
+    body: "{{ grid.stdout }}"
+    force_basic_auth: yes
+    status_code: 201
+    body_format: json
+
+- name: Add Grid view
+  uri:
+    url: http://admin:admin@{{ ansible_eth0.ipv4.address }}:5984/grid/_design/get_map
+    method: PUT
+    body: '{"views": {"grid": {"map": "function (doc) {emit(doc._id, doc.data)}"}}}'
+    force_basic_auth: yes
+    status_code: 201
+    body_format: json
+
+- name: Stop WebApp
+  sudo_user: ubuntu
+  command: pm2 stop App.js
+  ignore_errors: yes
+
+- name: Start WebApp
+  sudo_user: ubuntu
+  command: pm2 start /home/ubuntu/webapp/App.js 
+  ignore_errors: yes
+  when: npm_finished.changed

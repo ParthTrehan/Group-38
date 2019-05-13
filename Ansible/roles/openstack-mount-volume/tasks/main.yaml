@@ -1,0 +1,21 @@
+- name: Format volume using ext4
+  filesystem:
+    fstype: ext4
+    dev: /dev/vdb 
+
+- name: Create the directory
+  file:
+    path: /data
+    state: directory
+- name: Mount
+  mount:
+    name: /data
+    src: /dev/vdb
+    fstype: ext4
+    state: mounted
+- name: Change the permission of the mount directory
+  file:
+    path: /data
+    state: directory
+    mode: 0777
+    owner: ubuntu
