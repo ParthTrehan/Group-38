@@ -396,7 +396,7 @@
     var barChartConfig = {
       type: 'bar',
       data: {
-        labels: ['Stalking/Harasment', 'Sexual offences', 'Lust metric'],
+        labels: ['Lust metric', 'Stalking/Harasment', 'Sexual offences'],
         datasets: [{
           label: 'LGA crime and tweet distribution',
           data: [0, 0, 0],
@@ -467,7 +467,6 @@
     }
 
     function addPolyOnMap(contentStrings) {
-      console.log(contentStrings)
       console.log(map)
       for (let index = 0; index < allPoly.length; index++) {
         allPoly[index].setMap(map);
@@ -485,9 +484,12 @@
             url: "/data",
             type: 'GET',
             success: function (res) {
-              console.log(res);
-              lineChartConfig.data.datasets[0].data = getWeekData(JSON.parse(res), contentStrings[index][0]);
-              barChartConfig.data.datasets[0].data = [50, 60, 70]
+              lga = contentStrings[index][0];
+              lineChartConfig.data.datasets[0].data = getLineGraphData(JSON.parse(res), lga);
+
+              var barData = getStatfromLga(lga);
+              barData.push(getLustfromLga(JSON.parse(res), lga));
+              barChartConfig.data.datasets[0].data = barData
               window.lineChart.update();
               window.barChart.update();
             }
@@ -496,17 +498,38 @@
       }
     }
 
-    function getWeekData(data, lga) {
+    function getStatfromLga(lga) {
+      var result = [];
+      Aurin_data.features.forEach(element => {
+        if (lga === element.properties.lga_name11) {
+          result.push(element.properties.a70_stalking_harassment__and__threatening_behaviour);
+          result.push(element.properties.a30_sexual_offences);
+        }
+      });
+      return result;
+    }
+
+    function getLustfromLga(data, lga) {
+      lustMetric = 0;
+      data.rows.forEach(element => {
+        if (element.key[0] == lga && element.key[2] == 1) {
+          lustMetric = lustMetric + element.value
+        }
+      });
+      return lustMetric;
+    }
+
+    function getLineGraphData(data, lga) {
       var result = [];
       for (let index = 0; index < days.length; index++) {
-        flag=false
+        flag = false
         data.rows.forEach(element => {
           arr = [lga, days[index], 1]
-          if ( $(element.key).not(arr).length === 0 && $(arr).not(element.key).length === 0) {
-            flag=true
+          if ($(element.key).not(arr).length === 0 && $(arr).not(element.key).length === 0) {
+            flag = true
             result.push(element.value)
           }
-          
+
         });
         if (!flag) {
           result.push(0)
@@ -613,6 +636,7 @@
 
         var crimeRate = getCrimeRate(temp.a70_stalking_harassment__and__threatening_behaviour, temp.lga_erp)
         crimeRate = (crimeRate / 360) * 100
+        var lga = [];
         lga.push(grid_coordinates[index].properties.vic_lga__2);
         lga.push("<h6>LGA name: " + grid_coordinates[index].properties.vic_lga__2 + "</h6><br />" +
           "<p> Test LGA name: " + Aurin_data.features[index].properties.lga_name11 + "<br />" +
