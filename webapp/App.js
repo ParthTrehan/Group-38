@@ -5,7 +5,7 @@ const NodeCouchDb = require('node-couchdb');
 
 // node-couchdb instance talking to external service
 const couchExternal = new NodeCouchDb({
-    host: 'admin:admin@172.26.38.34',
+    host: 'admin:admin@127.0.0.1',
     protocol: 'http',
     port: 5984
 });
