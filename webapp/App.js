@@ -5,7 +5,7 @@ const NodeCouchDb = require('node-couchdb');
 
 // node-couchdb instance talking to external service
 const couchExternal = new NodeCouchDb({
-    host: 'admin:admin@127.0.0.1',
+    host: 'admin:admin@172.26.38.34',
     protocol: 'http',
     port: 5984
 });
@@ -15,8 +15,9 @@ couchExternal.listDatabases().then(function (dbs) {
 });
 
 const dbName = 'grid';
+const resultsDbName = 'analyze_results';
 const gridViewUrl = '_design/get_map/_view/grid';
-const resultViewUrl = '/analyze_results/_all_docs?descending=true&include_docs=true&limit=1';
+const resultViewUrl = '/_all_docs?descending=true&include_docs=true&limit=1';
 const app = express();
 
 app.set('view engine', 'ejs');
@@ -40,14 +41,15 @@ app.get('/', function (req, res) {
 });
 
 app.get('/data', function (req, res) {
-    couchExternal.get(dbName, resultViewUrl).then(
+    var jsonData = {};
+    couchExternal.get(resultsDbName, resultViewUrl).then(
         function (data, headers, status) {
-            res.render('index', {
-                grid: data.rows[0].doc.value
-            });
+            res.setHeader('Content-Type', 'application/json');
+            jsonData = data.data.rows[0].doc.value;
+            res.end(JSON.stringify(jsonData));
         },
         function name(err) {
-            res.send(err);
+            res.end(err);
         });
 });
 

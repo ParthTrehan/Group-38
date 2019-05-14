@@ -449,7 +449,12 @@
         },
       }
     };
-
+    var lgaNames = ["MELBOURNE CITY", "PORT PHILLIP CITY", "STONNINGTON CITY", "YARRA CITY", "BANYULE CITY",
+      "BAYSIDE CITY", "BOROONDARA CITY", "BRIMBANK CITY", "DAREBIN CITY", "GLEN EIRA CITY", "HOBSONS BAY CITY",
+      "KINGSTON CITY", "MANNINGHAM CITY", "MARIBYRNONG CITY", "MONASH CITY", "MOONEE VALLEY CITY", "MORELAND CITY",
+      "WHITEHORSE CITY", "CASEY CITY", "FRANKSTON CITY", "GREATER DANDENONG CITY", "HUME CITY", "KNOX CITY",
+      "MAROONDAH CITY", "MORNINGTON PENINSULA SHIRE", "NILLUMBIK SHIRE", "WHITTLESEA CITY", "WYNDHAM CITY"
+    ];
     // Get grid from html.
     var grid = document.getElementById("grid").value;
     grid = JSON.parse(grid);
@@ -485,11 +490,12 @@
             type: 'GET',
             success: function (res) {
               lga = contentStrings[index][0];
-              lineChartConfig.data.datasets[0].data = getLineGraphData(JSON.parse(res), lga);
+              console.log(res);
 
+              lineChartConfig.data.datasets[0].data = getLineGraphData(res, lga);
               var barData = getStatfromLga(lga);
               console.log(getStatfromLga(lga));
-              barData.push(getLustfromLga(JSON.parse(res), lga));
+              barData.push(getLustfromLga(res, lga));
               barChartConfig.data.datasets[0].data = barData
               window.lineChart.update();
               window.barChart.update();
@@ -571,61 +577,78 @@
     function makeLustMap() {
       resetMap();
       allPoly = [];
+      var lustResult;
       var contents = [];
-      for (let index = 0; index < grid_coordinates.length; index++) {
-        // get lust index from the couchdb
-        //-------------------------------
-        var lustIndex = 0;
-        $.ajax({
-          url: "/data",
-          type: 'GET',
-          success: function (res) {
-            lustIndex = getLustfromLga(res, grid_coordinates[index].properties.vic_lga__2)
+      var maxLustIndex = 0;
+      $.ajax({
+        url: "/data",
+        type: 'GET',
+        success: function (res) {
+          for (let index = 0; index < 28; index++) {
+            var population = Aurin_data.features[index].properties.lga_erp;
+            temp = getLustfromLga(res, lgaNames[index])
+            temp = (temp / population) * 100000
+            if (temp > maxLustIndex) {
+              maxLustIndex = temp;
+            }
           }
-        });
-        // -------------------------------
-        var lga = [];
-        lga.push(grid_coordinates[index].properties.vic_lga__2);
-        lga.push("<h6>" + grid_coordinates[index].properties.vic_lga__2 + "</h6><br />" +
-          "<p>LGA Code: " + grid_coordinates[index].properties.lga_pid + "<br />" +
-          "LGA Population: " + Aurin_data.features[index].properties.lga_erp + "<br />");
+          for (let index = 0; index < grid_coordinates.length; index++) {
+            var temp = Aurin_data.features[index].properties;
+            var lustIndex = getLustfromLga(res, grid_coordinates[index].properties.vic_lga__2)
+            var lustIndexRate = getRate(lustIndex, temp.lga_erp)
+            lustIndexRate = (lustIndexRate / maxLustIndex) * 100;
+            var lga = [];
+            lga.push(grid_coordinates[index].properties.vic_lga__2);
+            lga.push("<h6>" + grid_coordinates[index].properties.vic_lga__2 + "</h6><br />" +
+              "<p>LGA Code: " + grid_coordinates[index].properties.lga_pid + "<br />" +
+              "LGA Population: " + temp.lga_erp + "<br />" +
+              "Relative Lust Rate per 100,000: " + Math.trunc(lustIndexRate) + "%" + "<br /></p>");
 
-        //+"Total Lust tweet Index: " + lustIndex + "<br /></p>");
-        // lga.push({
-        //   lgaName = grid_coordinates[index].properties.vic_lga__2,
-        //   crimeRate = crimeRate,
-        // });
-        contents.push(lga);
-        // Construct all the polygons.
-        allPoly.push(new google.maps.Polygon({
-          paths: makePolygonPaths(grid_coordinates[index].geometry.coordinates[0][0]),
-          strokeColor: '#FF0000',
-          strokeOpacity: 0.8,
-          strokeWeight: 1,
-          fillColor: perc2color(lustIndex),
-          fillOpacity: 0.35
-        }));
-      }
-      addPolyOnMap(contents);
+            //+"Total Lust tweet Index: " + lustIndex + "<br /></p>");
+            contents.push(lga);
+            // Construct all the polygons.
+            allPoly.push(new google.maps.Polygon({
+              paths: makePolygonPaths(grid_coordinates[index].geometry.coordinates[0][0]),
+              strokeColor: '#FF0000',
+              strokeOpacity: 0.8,
+              strokeWeight: 1,
+              fillColor: perc2color(lustIndexRate),
+              fillOpacity: 0.35
+            }));
+          }
+          addPolyOnMap(contents);
+        }
+      });
     }
 
     function makeSexualOffencesValidationMap() {
       resetMap();
       allPoly = [];
       var contents = [];
+      maxSexualOffences = 0;
+      for (let index = 0; index < 28; index++) {
+        var tempPopulation = Aurin_data.features[index].properties.lga_erp;
+        var tempOffences = Aurin_data.features[index].properties.a30_sexual_offences
+        console.log(tempOffences + ":" + tempPopulation)
+        temp1 = (tempOffences / tempPopulation) * 100000
+        if (temp1 > maxSexualOffences) {
+          maxSexualOffences = temp1;
+        }
+      }
+      console.log(maxSexualOffences)
       for (let index = 0; index < Aurin_data.features.length; index++) {
         var temp = Aurin_data.features[index].properties;
-        var crimeRate = getCrimeRate(temp.a30_sexual_offences, temp.lga_erp)
-        crimeRate = (crimeRate / 496) * 100
+        var crimeRate = getRate(temp.a30_sexual_offences, temp.lga_erp)
+        crimeRate = (crimeRate / maxSexualOffences) * 100
         var lga = [];
         lga.push(grid_coordinates[index].properties.vic_lga__2);
         lga.push("<h6>LGA name: " + grid_coordinates[index].properties.vic_lga__2 + "</h6><br />" +
           "<p> Test LGA name: " + temp.lga_name11 + "<br />" +
           "LGA Code: " + grid_coordinates[index].properties.lga_pid + "<br />" +
           "Sexual Offences: " + temp.a30_sexual_offences + "<br />" +
-          "%%%%%%: " + crimeRate + "<br />" +
+          // "%%%%%%: " + crimeRate + "<br />" +
           "LGA Population: " + temp.lga_erp + "<br />" +
-          "Crime Rate per 100,000: " + crimeRate + "<br /></p>");
+          "Relative Crime Rate per 100,000: " + Math.trunc(crimeRate) + "%" + "<br /></p>");
         contents.push(lga);
         // Construct all the polygons.
         allPoly.push(new google.maps.Polygon({
@@ -644,20 +667,30 @@
       resetMap();
       allPoly = [];
       var contents = [];
+      maxStalkingOffences = 0;
+      for (let index = 0; index < 28; index++) {
+        var tempPopulation = Aurin_data.features[index].properties.lga_erp;
+        var tempOffences = Aurin_data.features[index].properties.a70_stalking_harassment__and__threatening_behaviour
+        console.log(tempOffences + ":" + tempPopulation)
+        temp1 = (tempOffences / tempPopulation) * 100000
+        if (temp1 > maxStalkingOffences) {
+          maxStalkingOffences = temp1;
+        }
+      }
+      console.log(maxStalkingOffences)
       for (let index = 0; index < Aurin_data.features.length; index++) {
         var temp = Aurin_data.features[index].properties;
-
-        var crimeRate = getCrimeRate(temp.a70_stalking_harassment__and__threatening_behaviour, temp.lga_erp)
-        crimeRate = (crimeRate / 360) * 100
+        var crimeRate = getRate(temp.a70_stalking_harassment__and__threatening_behaviour, temp.lga_erp)
+        crimeRate = (crimeRate / maxStalkingOffences) * 100
         var lga = [];
         lga.push(grid_coordinates[index].properties.vic_lga__2);
         lga.push("<h6>LGA name: " + grid_coordinates[index].properties.vic_lga__2 + "</h6><br />" +
-          "<p> Test LGA name: " + Aurin_data.features[index].properties.lga_name11 + "<br />" +
+          "<p> Test LGA name: " + temp.lga_name11 + "<br />" +
           "LGA Code: " + grid_coordinates[index].properties.lga_pid + "<br />" +
           "Stalking & Harassment Offences: " + temp.a70_stalking_harassment__and__threatening_behaviour + "<br />" +
-          "%%%%%%: " + crimeRate + "<br />" +
+          // "%%%%%%: " + crimeRate + "<br />" +
           "LGA Population: " + temp.lga_erp + "<br />" +
-          "Crime Rate per 100,000: " + crimeRate + "<br /></p>");
+          "Relative Crime Rate per 100,000: " + Math.trunc(crimeRate) + "%" + "<br /></p>");
         contents.push(lga);
         // Construct all the polygons.
         allPoly.push(new google.maps.Polygon({
@@ -678,8 +711,8 @@
       }
     }
 
-    function getCrimeRate(crimes, population) {
-      var val = ((crimes / population) * 100000);
+    function getRate(parameter, population) {
+      var val = ((parameter / population) * 100000);
       return Math.trunc(val)
     }
 
