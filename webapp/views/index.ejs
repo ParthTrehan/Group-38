@@ -575,14 +575,22 @@
       for (let index = 0; index < grid_coordinates.length; index++) {
         // get lust index from the couchdb
         //-------------------------------
-        var lustIndex = getRandomInt(100);
+        var lustIndex = 0;
+        $.ajax({
+          url: "/data",
+          type: 'GET',
+          success: function (res) {
+            lustIndex = getLustfromLga(res, grid_coordinates[index].properties.vic_lga__2)
+          }
+        });
         // -------------------------------
         var lga = [];
         lga.push(grid_coordinates[index].properties.vic_lga__2);
         lga.push("<h6>" + grid_coordinates[index].properties.vic_lga__2 + "</h6><br />" +
           "<p>LGA Code: " + grid_coordinates[index].properties.lga_pid + "<br />" +
-          "LGA Population: " + Aurin_data.features[index].properties.lga_erp + "<br />" +
-          "Total Lust tweet Index: " + lustIndex + "<br /></p>");
+          "LGA Population: " + Aurin_data.features[index].properties.lga_erp + "<br />");
+
+        //+"Total Lust tweet Index: " + lustIndex + "<br /></p>");
         // lga.push({
         //   lgaName = grid_coordinates[index].properties.vic_lga__2,
         //   crimeRate = crimeRate,
