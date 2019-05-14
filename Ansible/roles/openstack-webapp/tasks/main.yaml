@@ -13,15 +13,8 @@
 - name: Install pm2
   npm: name=pm2 global=yes production=yes
 
-- name: Create APP Directory
-  file: path=/home/ubuntu/webapp state=directory
-
-- name: Git Clone webapp
-  git: repo=https://github.com/kush0609/webapp.git dest=/home/ubuntu/webapp update=yes force=yes
-  register: git_finished
-
 - name: Running NPM install
-  npm: path=/home/ubuntu/webapp
+  npm: path=/home/ubuntu/deploy/webapp
   register: npm_finished
   when: git_finished.changed
 
@@ -30,7 +23,7 @@
   shell: 'curl -XPUT "http://admin:admin@{{ ansible_eth0.ipv4.address }}:5984/grid"'
 
 - name: get remote grid
-  command: "cat /home/ubuntu/webapp/grid.json"
+  command: "cat /home/ubuntu/deploy/webapp/grid.json"
   register: grid
 
 - name: Add Grid doc
@@ -58,6 +51,6 @@
 
 - name: Start WebApp
   sudo_user: ubuntu
-  command: pm2 start /home/ubuntu/webapp/App.js 
+  command: pm2 start /home/ubuntu/deploy/webapp/App.js 
   ignore_errors: yes
   when: npm_finished.changed
