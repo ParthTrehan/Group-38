@@ -42,6 +42,12 @@
     status_code: 201
     body_format: json
 
+- name: Map reduce
+  become: yes
+  shell: nohup bash -u send_updated_result.sh > output.log &
+  args:
+    chdir: /home/ubuntu/deploy/Data
+
 - name: Stop WebApp
   sudo_user: ubuntu
   command: pm2 stop App.js

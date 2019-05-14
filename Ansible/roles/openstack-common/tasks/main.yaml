@@ -92,7 +92,7 @@
     question: couchdb/nodename
     value: couchdb@{{ item }}
     vtype: string
-   with_items:
+  loop:
     - "{{ ansible_eth0.ipv4.address }}"
 
 - name: Set couch cookie
@@ -113,14 +113,14 @@
   debconf:
     name: couchdb
     question: couchdb/adminpass
-    value: {{ COUCHDB_PASSWORD }}
+    value: "{{ COUCHDB_PASSWORD }}"
     vtype: password
 
 - name: Set couch admin password
   debconf:
     name: couchdb
     question: couchdb/adminpass_again
-    value: {{ COUCHDB_PASSWORD }}
+    value: "{{ COUCHDB_PASSWORD }}"
     vtype: password
 
 
@@ -145,8 +145,8 @@
   apt:    
     name: couchdb
     force: yes
-    environment:
-        DEBIAN_FRONTEND: noninteractive
+  environment:
+    DEBIAN_FRONTEND: noninteractive
 
 - name: changing database directory to volume mount
   lineinfile: 

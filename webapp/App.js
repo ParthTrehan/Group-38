@@ -2,8 +2,6 @@ const express = require('express');
 const bodyparser = require('body-parser');
 const path = require('path');
 const NodeCouchDb = require('node-couchdb');
-const fs = require('fs');
-
 
 // node-couchdb instance talking to external service
 const couchExternal = new NodeCouchDb({
@@ -17,7 +15,8 @@ couchExternal.listDatabases().then(function (dbs) {
 });
 
 const dbName = 'grid';
-const viewurl = '_design/get_map/_view/grid';
+const gridViewUrl = '_design/get_map/_view/grid';
+const resultViewUrl = '/analyze_results/_all_docs?descending=true&include_docs=true&limit=1';
 const app = express();
 
 app.set('view engine', 'ejs');
@@ -28,12 +27,8 @@ app.use(bodyparser.urlencoded({
     extended: false
 }));
 
-app.get('/searching', function (req, res) {
-    res.send("hello workd"); 
-});
-
 app.get('/', function (req, res) {
-    couchExternal.get(dbName, viewurl).then(
+    couchExternal.get(dbName, gridViewUrl).then(
         function (data, headers, status) {
             res.render('index', {
                 grid: data.data.rows[0]
@@ -45,8 +40,15 @@ app.get('/', function (req, res) {
 });
 
 app.get('/data', function (req, res) {
-    let rawdata = fs.readFileSync('test.json');
-    res.send(rawdata); //replace with your data here
+    couchExternal.get(dbName, resultViewUrl).then(
+        function (data, headers, status) {
+            res.render('index', {
+                grid: data.rows[0].doc.value
+            });
+        },
+        function name(err) {
+            res.send(err);
+        });
 });
 
 app.listen(3000, function () {
