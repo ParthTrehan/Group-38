@@ -63,6 +63,6 @@
 - hosts: localhost
   remote_user: ubuntu
   tasks:
-    - shell: firefox {{ item }}:3000
+    - shell: firefox {{ item }}:3000 &
       loop: "{{groups['webserver']}}"
   ignore_errors: yes
