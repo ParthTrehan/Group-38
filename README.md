@@ -2,6 +2,8 @@
 
 # COMP90024 Cluster & Cloud Computing Assignment 2
 
+Prerequisites
+-
 We have built a simple real-time cloud project which runs on [Nectar Cloud](https://nectar.org.au/). This project uses various frameworks and technologies including:
 
  1. **Ansible:** Used as a configration management tool to automate cloud.
