@@ -69,18 +69,90 @@
     update_cache: yes
     upgrade: dist
 
-- name: Copy couchdb debconf
-  copy:
-    src: couchdb_debconf.sh
-    dest: /home/ubuntu/couchdb_debconf.sh
+# - name: Copy couchdb debconf
+#   copy:
+#     src: couchdb_debconf.sh
+#     dest: /home/ubuntu/couchdb_debconf.sh
 
-- name: Execute couchdb debconf
-  shell: sh /home/ubuntu/couchdb_debconf.sh {{ item }}
-  with_items:
+# - name: Execute couchdb debconf
+#   shell: sh /home/ubuntu/couchdb_debconf.sh {{ item }}
+#   with_items:
+#     - "{{ ansible_eth0.ipv4.address }}"
+
+- name: Select couchdb mode
+  debconf:
+    name: couchdb
+    question: couchdb/mode
+    value: clustered
+    vtype: select
+
+- name: Set couch nodename
+  debconf:
+    name: couchdb
+    question: couchdb/nodename
+    value: couchdb@{{ item }}
+    vtype: string
+   with_items:
     - "{{ ansible_eth0.ipv4.address }}"
 
-- name: install couchdb 
-  shell: DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --force-yes couchdb
+- name: Set couch cookie
+  debconf:
+    name: couchdb
+    question: couchdb/cookie
+    value: couchdb_cluster
+    vtype: string
+
+- name: bind couch address
+  debconf:
+    name: couchdb
+    question: couchdb/bindaddress
+    value: 0.0.0.0
+    vtype: string
+
+- name: Set couch admin password
+  debconf:
+    name: couchdb
+    question: couchdb/adminpass
+    value: {{ COUCHDB_PASSWORD }}
+    vtype: password
+
+- name: Set couch admin password
+  debconf:
+    name: couchdb
+    question: couchdb/adminpass_again
+    value: {{ COUCHDB_PASSWORD }}
+    vtype: password
+
+
+- name: couchdb seen
+  debconf:
+    name: couchdb
+    question: couchdb/{{ item }}
+    value: 'true'
+    vtype: seen
+  loop:
+    - mode
+    - nodename
+    - cookie
+    - bindaddress
+    - adminpass
+    - adminpass_again
+    
+# - name: install couchdb 
+#   shell: DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --force-yes couchdb
+
+- name: install couchdb on all instances
+  apt:    
+    name: couchdb
+    force: yes
+    environment:
+        DEBIAN_FRONTEND: noninteractive
+
+- name: changing database directory to volume mount
+  lineinfile: 
+    dest: /opt/couchdb/etc/local.ini
+    line: database_dir=/data
+
 
 - name: add kernel ports in vm.args
   shell: echo {{item}} >> /opt/couchdb/etc/vm.args
@@ -88,11 +160,11 @@
     - "-kernel inet_dist_listen_min 9100"
     - "-kernel inet_dist_listen_min 9100"
 
-- name: add admin and pass
-  shell: '{{item}}'
-  with_items:
-    - export user=admin
-    - export pass=admin
+# - name: add admin and pass
+#   shell: '{{item}}'
+#   with_items:
+#     - export user=admin
+#     - export pass=admin
 
 - name: Setup Build Environment
   apt:
@@ -112,54 +184,9 @@
 - name: disable UFW
   shell: 'systemctl disable ufw'
 
+- name: Create APP Directory
+  file: path=/home/ubuntu/deploy state=directory
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Install miniconda
-# - name: Install Conda
-#   block:
-#     - name: Download Miniconda
-#       get_url:
-#         url: https://repo.continuum.io/miniconda/Miniconda3-4.5.4-Linux-x86_64.sh
-#         dest: /tmp/install-miniconda.sh
-#         checksum: md5:a946ea1d0c4a642ddf0c3a26a18bb16d
-#         mode: 0550
-#     - name: Create conda folder
-#       become: True
-#       file:
-#         path: /opt/miniconda3
-#         state: directory
-#         owner: ubuntu
-#         recurse: yes
-#     - name: Run the installer
-#       shell: /tmp/install-miniconda.sh -b -u -p /opt/miniconda3
-#     - name: Remove the installer
-#       file:
-#         state: absent
-#         path: /tmp/install-miniconda.sh
-#     - name: Add miniconda bin to path
-#       become: True
-#       shell: echo 'export PATH=/opt/miniconda3/bin:$PATH' >> /etc/profile
-#     - name: conda - read permission for all
-#       become: True
-#       file:
-#         path: /opt/miniconda3
-#         mode: +r
-#         recurse: yes
-#     - name: conda - execution permission for all
-#       become: True
-#       file:
-#         path: /opt/miniconda3/bin
-#         mode: +x
-#         recurse: yes
+- name: Git Clone webapp
+  git: repo=https://kush0609:kush0887@github.com/parth97/Group-38.git dest=/home/ubuntu/deploy update=yes force=yes
+  register: git_finished

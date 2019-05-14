@@ -10,6 +10,8 @@
   set_fact:
     sg_names: '{{ sg_names|default([]) + [ item.name ] }}'
   loop: '{{ security_groups }}'
+  set_fact:
+    sg_names: '{{ sg_names + [ 'internal' ] }}'
 
 - debug: 
     msg: "Security groups {{ sg_names }} have been created."

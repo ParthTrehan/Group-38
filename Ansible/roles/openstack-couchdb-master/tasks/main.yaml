@@ -6,19 +6,11 @@
     dest: /home/ubuntu/add_cluster_node.sh
 
 - name: Execute the cluster config script
-  shell: sh /home/ubuntu/add_cluster_node.sh {{ ansible_eth0.ipv4.address }} {{ item }}
+  shell: sh /home/ubuntu/add_cluster_node.sh {{ ansible_eth0.ipv4.address }} {{ item }} {{ COUCHDB_PASSWORD }}
   loop: "{{groups['harvesters']}}"
 
 - name: finish clusters
-  shell: 'curl -XPOST "http://admin:admin@{{ ansible_eth0.ipv4.address }}:5984/_cluster_setup" \ --header "Content-Type: application/json" --data "{\"action\": \"finish_cluster\"}"'
-
-
-- name: Create APP Directory
-  file: path=/home/ubuntu/deploy state=directory
-
-- name: Git Clone webapp
-  git: repo=https://kush0609:kush0887@github.com/parth97/Group-38.git dest=/home/ubuntu/deploy update=yes force=yes
-  register: git_finished
+  shell: 'curl -XPOST "http://admin:{{ COUCHDB_PASSWORD }}@{{ ansible_eth0.ipv4.address }}:5984/_cluster_setup" \ --header "Content-Type: application/json" --data "{\"action\": \"finish_cluster\"}"'
 
 
 # - name: run my script!

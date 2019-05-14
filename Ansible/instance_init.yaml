@@ -1,45 +1,49 @@
-# - hosts: all
-#   remote_user: ubuntu
-#   become: yes
-#   tasks:
-#     - lineinfile: 
-#         path: /etc/environment 
-#         state: present
-#         regexp: '^http_proxy'
-#         line: 'http_proxy=http://wwwproxy.unimelb.edu.au:8000'
-#     - lineinfile: 
-#         path: /etc/environment
-#         state: present
-#         regexp: '^https_proxy'
-#         line: 'https_proxy=http://wwwproxy.unimelb.edu.au:8000'
-#     - lineinfile: 
-#         path: /etc/environment 
-#         state: present
-#         regexp: '^ftp_proxy'
-#         line: 'ftp_proxy=http://wwwproxy.unimelb.edu.au:8000'
-#     - lineinfile: 
-#         path: /etc/environment 
-#         state: present
-#         regexp: '^no_proxy'
-#         line: 'no_proxy=localhost,127.0.0.1,127.0.1.1,{{ ansible_eth0.ipv4.address }}'
+- hosts: all
+  remote_user: ubuntu
+  become: yes
+  tasks:
+    - lineinfile: 
+        path: /etc/environment 
+        state: present
+        regexp: '^http_proxy'
+        line: 'http_proxy=http://wwwproxy.unimelb.edu.au:8000'
+    - lineinfile: 
+        path: /etc/environment
+        state: present
+        regexp: '^https_proxy'
+        line: 'https_proxy=http://wwwproxy.unimelb.edu.au:8000'
+    - lineinfile: 
+        path: /etc/environment 
+        state: present
+        regexp: '^ftp_proxy'
+        line: 'ftp_proxy=http://wwwproxy.unimelb.edu.au:8000'
+    - lineinfile: 
+        path: /etc/environment 
+        state: present
+        regexp: '^no_proxy'
+        line: 'no_proxy=localhost,127.0.0.1,127.0.1.1,{{ ansible_eth0.ipv4.address }}'
 
-# - hosts: all
-#   remote_user: ubuntu
-#   become: yes
-#   roles:
-#     - role: openstack-mount-volume
-#     - role: openstack-common
+- hosts: all
+  remote_user: ubuntu
+  become: yes
+  roles:
+    - role: openstack-mount-volume
+    - role: openstack-common
 
-# - hosts: webserver
-#   remote_user: ubuntu
-#   sudo: yes
-#   roles:
-#     - role: openstack-couchdb-master
-#     - role: openstack-loaddata
-#     - role: openstack-webapp
+- hosts: webserver
+  remote_user: ubuntu
+  sudo: yes
+  roles:
+    - role: openstack-couchdb-master
 
 - hosts: harvesters
   remote_user: ubuntu
   become: yes
   roles:
     - role: openstack-harvesters
+
+- hosts: webserver
+  remote_user: ubuntu
+  sudo: yes
+  roles:
+    - role: openstack-webapp

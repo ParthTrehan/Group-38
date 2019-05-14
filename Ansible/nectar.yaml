@@ -6,5 +6,5 @@
   roles:
    - role: openstack-image
    - role: openstack-volume
-#   - role: openstack-security-group
+   - role: openstack-security-group
    - role: openstack-instance

@@ -2,13 +2,13 @@
 - name: add nodesource nodejs
   shell: "curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -"
 
-- name: install 
-  shell: sudo apt-get install -y nodejs
+# - name: install 
+#   shell: sudo apt-get install -y nodejs
 
-- name: Install Packages
-  apt: name={{ item }} update_cache=yes state=latest
-  with_items:
-    - git
+- name: install nodejs on webserver
+  apt:    
+    name: nodejs
+    force: yes
 
 - name: Install pm2
   npm: name=pm2 global=yes production=yes
@@ -16,11 +16,9 @@
 - name: Running NPM install
   npm: path=/home/ubuntu/deploy/webapp
   register: npm_finished
-  when: git_finished.changed
-
 
 - name: Create Grid database
-  shell: 'curl -XPUT "http://admin:admin@{{ ansible_eth0.ipv4.address }}:5984/grid"'
+  shell: 'curl -XPUT "http://admin:{{ COUCHDB_PASSWORD }}@{{ ansible_eth0.ipv4.address }}:5984/grid"'
 
 - name: get remote grid
   command: "cat /home/ubuntu/deploy/webapp/grid.json"
@@ -28,7 +26,7 @@
 
 - name: Add Grid doc
   uri:
-    url: http://admin:admin@{{ ansible_eth0.ipv4.address }}:5984/grid/map
+    url: http://admin:{{ COUCHDB_PASSWORD }}@{{ ansible_eth0.ipv4.address }}:5984/grid/map
     method: PUT
     body: "{{ grid.stdout }}"
     force_basic_auth: yes
@@ -37,7 +35,7 @@
 
 - name: Add Grid view
   uri:
-    url: http://admin:admin@{{ ansible_eth0.ipv4.address }}:5984/grid/_design/get_map
+    url: http://admin:{{ COUCHDB_PASSWORD }}@{{ ansible_eth0.ipv4.address }}:5984/grid/_design/get_map
     method: PUT
     body: '{"views": {"grid": {"map": "function (doc) {emit(doc._id, doc.data)}"}}}'
     force_basic_auth: yes
