@@ -1,0 +1,1 @@
+curl -X PUT http://admin:admin@localhost:5984/tweets/_design/tweets-reduce -d @views.json
