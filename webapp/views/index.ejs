@@ -52,14 +52,14 @@
         <h4>Toogles for the map</h4>
         <ul>
           <li>
-            <a href="#" onclick="makeLustMap();"> Click to see percentage of lusty tweets</a>
+            <a href="#" onclick="makeLustMap();"> Click here for Relative Lust tweets distribution</a>
           </li>
           <li>
-            <a href="#" onclick="makeSexualOffencesValidationMap();"> Click to see sexual offences crime
+            <a href="#" onclick="makeSexualOffencesValidationMap();"> Click here for sexual offences crime
               statistics</a>
           </li>
           <li>
-            <a href="#" onclick="makeStalkingHarassmentValidationMap();"> Click to see stalking harassment crime
+            <a href="#" onclick="makeStalkingHarassmentValidationMap();"> Click here for stalking & harassment crime
               statistics</a></li>
           <li>
             <a href="#" onclick="resetMap()"> Reset map</a>
@@ -602,7 +602,7 @@
             lga.push("<h6>" + grid_coordinates[index].properties.vic_lga__2 + "</h6><br />" +
               "<p>LGA Code: " + grid_coordinates[index].properties.lga_pid + "<br />" +
               "LGA Population: " + temp.lga_erp + "<br />" +
-              "Relative Lust Rate per 100,000: " + Math.trunc(lustIndexRate) + "%" + "<br /></p>");
+              "Relative Lust Rate: " + Math.trunc(lustIndexRate) + "%" + "<br /></p>");
 
             //+"Total Lust tweet Index: " + lustIndex + "<br /></p>");
             contents.push(lga);
@@ -648,7 +648,7 @@
           "Sexual Offences: " + temp.a30_sexual_offences + "<br />" +
           // "%%%%%%: " + crimeRate + "<br />" +
           "LGA Population: " + temp.lga_erp + "<br />" +
-          "Relative Crime Rate per 100,000: " + Math.trunc(crimeRate) + "%" + "<br /></p>");
+          "Relative Crime Rate: " + Math.trunc(crimeRate) + "%" + "<br /></p>");
         contents.push(lga);
         // Construct all the polygons.
         allPoly.push(new google.maps.Polygon({
@@ -690,7 +690,7 @@
           "Stalking & Harassment Offences: " + temp.a70_stalking_harassment__and__threatening_behaviour + "<br />" +
           // "%%%%%%: " + crimeRate + "<br />" +
           "LGA Population: " + temp.lga_erp + "<br />" +
-          "Relative Crime Rate per 100,000: " + Math.trunc(crimeRate) + "%" + "<br /></p>");
+          "Relative Crime Rate: " + Math.trunc(crimeRate) + "%" + "<br /></p>");
         contents.push(lga);
         // Construct all the polygons.
         allPoly.push(new google.maps.Polygon({
