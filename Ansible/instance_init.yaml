@@ -65,3 +65,4 @@
   tasks:
     - shell: firefox {{ item }}:3000
       loop: "{{groups['webserver']}}"
+  ignore_errors: yes
