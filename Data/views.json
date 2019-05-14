@@ -1,0 +1,12 @@
+{
+    "views": {
+        "all-tweets": {
+            "map": "function (doc) {if(doc.lga_name && doc.lga_name != \"Not Found\"){emit([doc.lga_name, doc.day_of_week, doc.lust_metric], 1);}}",
+            "reduce": "function (key, values) { return sum(values); }"
+        },
+        "lga-lust": {
+            "map": "function (doc) {if(doc.lga_name && doc.lga_name != \"Not Found\"){emit([doc.lga_name, doc.lust_metric], 1);}}",
+            "reduce": "function (key, values) { return sum(values); }"
+        }
+    }
+}
