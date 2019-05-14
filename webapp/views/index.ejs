@@ -488,6 +488,7 @@
               lineChartConfig.data.datasets[0].data = getLineGraphData(JSON.parse(res), lga);
 
               var barData = getStatfromLga(lga);
+              console.log(getStatfromLga(lga));
               barData.push(getLustfromLga(JSON.parse(res), lga));
               barChartConfig.data.datasets[0].data = barData
               window.lineChart.update();
@@ -582,6 +583,10 @@
           "<p>LGA Code: " + grid_coordinates[index].properties.lga_pid + "<br />" +
           "LGA Population: " + Aurin_data.features[index].properties.lga_erp + "<br />" +
           "Total Lust tweet Index: " + lustIndex + "<br /></p>");
+        // lga.push({
+        //   lgaName = grid_coordinates[index].properties.vic_lga__2,
+        //   crimeRate = crimeRate,
+        // });
         contents.push(lga);
         // Construct all the polygons.
         allPoly.push(new google.maps.Polygon({

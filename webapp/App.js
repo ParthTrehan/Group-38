@@ -28,6 +28,10 @@ app.use(bodyparser.urlencoded({
     extended: false
 }));
 
+app.get('/searching', function (req, res) {
+    res.send("hello workd"); 
+});
+
 app.get('/', function (req, res) {
     couchExternal.get(dbName, viewurl).then(
         function (data, headers, status) {
