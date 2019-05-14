@@ -26,6 +26,9 @@
 - hosts: all
   remote_user: ubuntu
   become: yes
+  vars_files:
+    - host_vars/nectar.yaml
+  gather_facts: true
   roles:
     - role: openstack-mount-volume
     - role: openstack-common
@@ -33,17 +36,32 @@
 - hosts: webserver
   remote_user: ubuntu
   sudo: yes
+  vars_files:
+    - host_vars/nectar.yaml
+  gather_facts: true
   roles:
     - role: openstack-couchdb-master
 
 - hosts: harvesters
   remote_user: ubuntu
   become: yes
+  vars_files:
+    - host_vars/nectar.yaml
+  gather_facts: true
   roles:
     - role: openstack-harvesters
 
 - hosts: webserver
   remote_user: ubuntu
   sudo: yes
+  vars_files:
+    - host_vars/nectar.yaml
+  gather_facts: true
   roles:
     - role: openstack-webapp
+
+- hosts: localhost
+  remote_user: ubuntu
+  tasks:
+    - shell: firefox {{ item }}:3000
+      loop: "{{groups['webserver']}}"

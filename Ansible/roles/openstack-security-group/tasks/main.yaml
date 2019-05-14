@@ -8,10 +8,14 @@
 
 - name: Create a list of security group names
   set_fact:
-    sg_names: '{{ sg_names|default([]) + [ item.name ] }}'
+    sg_names1: '{{ sg_names1|default([]) + [ item.name ] }}'
   loop: '{{ security_groups }}'
+
+- name: Set security names
   set_fact:
-    sg_names: '{{ sg_names + [ 'internal' ] }}'
+    sg_names: '{{ sg_names1 + [ item.name ] }}'
+  with_items:
+    - { name: 'internal', groups: 'sg' }
 
 - debug: 
     msg: "Security groups {{ sg_names }} have been created."
