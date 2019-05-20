@@ -2,6 +2,9 @@
 
 # COMP90024 Cluster & Cloud Computing Assignment 2
 
+The demo can be seen at http://172.26.38.49:3000/ 
+make sure the Unimelb VPN is connected.
+
 Prerequisites
 -
 We have built a simple real-time cloud project which runs on [Nectar Cloud](https://nectar.org.au/). This project uses various frameworks and technologies including:
